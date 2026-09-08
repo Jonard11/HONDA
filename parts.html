@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parts & Accessories — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item active"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Parts &amp; Accessories</h1><p>Manage Honda genuine parts and accessories</p></div>
+        <div class="topbar-actions">
+          <button class="btn btn-red btn-sm" id="openAddModal"><i class="fa-solid fa-plus"></i> Add Part</button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-body" style="padding:14px 18px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Search parts by name or part number..."/>
+              </div>
+              <select id="filterCat" style="padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.875rem;background:var(--gray-50);outline:none;">
+                <option value="">All Categories</option>
+              </select>
+              <select id="filterStock" style="padding:8px 12px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.875rem;background:var(--gray-50);outline:none;">
+                <option value="">All Stock</option><option value="low">Low Stock</option><option value="ok">In Stock</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-gears"></i> All Parts &amp; Accessories</h3>
+            <span class="badge badge-red" id="pCount">0 parts</span>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Part</th><th>Part Number</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="partsBody"><tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="pModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-gears"></i> <span id="modalTitle">Add Part</span></h3>
+        <button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="pId"/>
+        <div class="form-group">
+          <label>Part Name *</label>
+          <div class="input-wrap"><i class="fa-solid fa-gear icon"></i>
+            <input type="text" id="pName" placeholder="e.g. Brake Pad"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Part Number</label>
+            <div class="input-wrap"><i class="fa-solid fa-barcode icon"></i>
+              <input type="text" id="pPartNumber" placeholder="e.g. HND-BP-001"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="pCategory"><option value="">Select category</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price (₱) *</label>
+            <div class="input-wrap"><i class="fa-solid fa-peso-sign icon"></i>
+              <input type="number" id="pPrice" placeholder="0.00" min="0" step="0.01"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Stock Quantity *</label>
+            <div class="input-wrap"><i class="fa-solid fa-boxes-stacked icon"></i>
+              <input type="number" id="pStock" placeholder="0" min="0"/>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Low Stock Threshold</label>
+          <div class="input-wrap"><i class="fa-solid fa-triangle-exclamation icon"></i>
+            <input type="number" id="pThreshold" placeholder="10" min="1"/>
+          </div>
+          <div class="form-hint">Alert when stock falls at or below this number</div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pDesc" placeholder="Optional description"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelModal">Cancel</button>
+        <button class="btn btn-red" id="savePart"><i class="fa-solid fa-floppy-disk"></i> Save Part</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="delModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-trash" style="color:var(--danger);"></i> Delete Part</h3>
+        <button class="modal-close" id="closeDelModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body"><p>Delete <strong id="delPName"></strong>? This cannot be undone.</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelDel">Cancel</button>
+        <button class="btn btn-danger" id="confirmDel"><i class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast, formatCurrency, stockBadge } from "./js/auth-guard.js";
+    import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    await requireAuth(); initSidebar();
+    document.getElementById('logoutBtn').addEventListener('click', async e=>{ e.preventDefault(); await logoutUser(); });
+
+    let allP=[], allCats=[], delId=null;
+    if(new URLSearchParams(location.search).get('action')==='add') setTimeout(()=>document.getElementById('openAddModal').click(),400);
+
+    async function loadCats(){
+      const snap=await getDocs(query(collection(db,'categories'),orderBy('name')));
+      allCats=snap.docs.map(d=>({id:d.id,...d.data()}));
+      ['filterCat','pCategory'].forEach(id=>{
+        const sel=document.getElementById(id);
+        const first=sel.options[0]; sel.innerHTML=''; sel.appendChild(first);
+        allCats.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
+      });
+    }
+    async function loadParts(){
+      const snap=await getDocs(query(collection(db,'parts'),orderBy('name')));
+      allP=snap.docs.map(d=>({id:d.id,...d.data()}));
+      render(allP);
+    }
+    function render(list){
+      document.getElementById('pCount').textContent=`${list.length} parts`;
+      const tb=document.getElementById('partsBody');
+      if(!list.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="ei">⚙️</div><h3>No parts found</h3><p>Add your first Honda genuine part.</p></div></td></tr>`;return;}
+      tb.innerHTML=list.map(p=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:9px;">
+          <div class="item-img"><i class="fa-solid fa-gear" style="color:var(--gray-400);"></i></div>
+          <div><div class="td-name">${p.name}</div><div style="font-size:.75rem;color:var(--gray-400);">${(p.description||'').slice(0,35)}${(p.description||'').length>35?'…':''}</div></div>
+        </div></td>
+        <td><span class="inv-id">${p.partNumber||'—'}</span></td>
+        <td><span class="badge badge-dark">${p.categoryName||'—'}</span></td>
+        <td class="fw-700 text-red">${formatCurrency(p.price)}</td>
+        <td class="fw-700">${p.stock??0}</td>
+        <td>${stockBadge(p.stock,p.lowStockThreshold||10)}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-icon" onclick="openEdit('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-danger btn-icon"  onclick="openDel('${p.id}','${p.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`).join('');
+    }
+    function applyFilter(){
+      const s=document.getElementById('searchInput').value.toLowerCase();
+      const c=document.getElementById('filterCat').value;
+      const st=document.getElementById('filterStock').value;
+      render(allP.filter(p=>{
+        const mS=p.name.toLowerCase().includes(s)||(p.partNumber||'').toLowerCase().includes(s);
+        const mC=!c||p.category===c;
+        const isLow=(p.stock||0)<=(p.lowStockThreshold||10);
+        const mSt=!st||(st==='low'?isLow:!isLow);
+        return mS&&mC&&mSt;
+      }));
+    }
+    document.getElementById('searchInput').addEventListener('input',applyFilter);
+    document.getElementById('filterCat').addEventListener('change',applyFilter);
+    document.getElementById('filterStock').addEventListener('change',applyFilter);
+
+    function openModal(edit=false){ document.getElementById('modalTitle').textContent=edit?'Edit Part':'Add Part'; document.getElementById('pModal').classList.add('open'); }
+    function closeModal(){ document.getElementById('pModal').classList.remove('open'); document.getElementById('pId').value=''; ['pName','pPartNumber','pPrice','pStock','pThreshold','pDesc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('pCategory').value=''; }
+    document.getElementById('openAddModal').addEventListener('click',()=>openModal(false));
+    document.getElementById('closeModal').addEventListener('click',closeModal);
+    document.getElementById('cancelModal').addEventListener('click',closeModal);
+
+    window.openEdit=(id)=>{
+      const p=allP.find(x=>x.id===id); if(!p) return;
+      document.getElementById('pId').value=p.id; document.getElementById('pName').value=p.name;
+      document.getElementById('pPartNumber').value=p.partNumber||''; document.getElementById('pCategory').value=p.category||'';
+      document.getElementById('pPrice').value=p.price||''; document.getElementById('pStock').value=p.stock??'';
+      document.getElementById('pThreshold').value=p.lowStockThreshold||10; document.getElementById('pDesc').value=p.description||'';
+      openModal(true);
+    };
+    window.openDel=(id,name)=>{ delId=id; document.getElementById('delPName').textContent=name; document.getElementById('delModal').classList.add('open'); };
+    document.getElementById('closeDelModal').addEventListener('click',()=>{ document.getElementById('delModal').classList.remove('open'); delId=null; });
+    document.getElementById('cancelDel').addEventListener('click',()=>{ document.getElementById('delModal').classList.remove('open'); delId=null; });
+    document.getElementById('confirmDel').addEventListener('click',async()=>{
+      if(!delId) return;
+      try{ await deleteDoc(doc(db,'parts',delId)); document.getElementById('delModal').classList.remove('open'); showToast('Deleted','Part removed.','success'); await loadParts(); }
+      catch{ showToast('Error','Failed to delete.','error'); } delId=null;
+    });
+    document.getElementById('savePart').addEventListener('click',async()=>{
+      const id=document.getElementById('pId').value;
+      const name=document.getElementById('pName').value.trim();
+      const catId=document.getElementById('pCategory').value;
+      const partNumber=document.getElementById('pPartNumber').value.trim();
+      const price=parseFloat(document.getElementById('pPrice').value)||0;
+      const stock=parseInt(document.getElementById('pStock').value)||0;
+      const threshold=parseInt(document.getElementById('pThreshold').value)||10;
+      const desc=document.getElementById('pDesc').value.trim();
+      if(!name){ showToast('Validation','Part name is required.','warning'); return; }
+      if(!catId){ showToast('Validation','Please select a category.','warning'); return; }
+      const cat=allCats.find(c=>c.id===catId);
+      const data={name,partNumber,category:catId,categoryName:cat?.name||'',price,stock,lowStockThreshold:threshold,description:desc,updatedAt:serverTimestamp()};
+      const btn=document.getElementById('savePart');
+      btn.disabled=true; btn.innerHTML='<span class="spinner" style="width:15px;height:15px;border-width:2px;"></span> Saving...';
+      try{
+        if(id){ await updateDoc(doc(db,'parts',id),data); showToast('Updated',`"${name}" updated.`,'success'); }
+        else{ await addDoc(collection(db,'parts'),{...data,createdAt:serverTimestamp()}); showToast('Added',`"${name}" added.`,'success'); }
+        closeModal(); await loadParts();
+      }catch{ showToast('Error','Failed to save.','error'); }
+      finally{ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Part'; }
+    });
+    await loadCats(); await loadParts();
+  </script>
+</body>
+</html>

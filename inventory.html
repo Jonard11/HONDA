@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item active"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Inventory Management</h1><p>Stock In, Stock Out, and low-stock alerts</p></div>
+      </header>
+      <main class="page-content">
+        <!-- Action Cards -->
+        <div class="action-grid">
+          <div class="action-card" id="btnStockIn">
+            <div class="ac-icon" style="background:var(--success-light);color:var(--success);"><i class="fa-solid fa-arrow-down"></i></div>
+            <div class="ac-label">Stock In</div><div class="ac-desc">Receive new inventory</div>
+          </div>
+          <div class="action-card" id="btnStockOut">
+            <div class="ac-icon" style="background:var(--danger-light);color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div>
+            <div class="ac-label">Stock Out</div><div class="ac-desc">Issue / use stock</div>
+          </div>
+          <div class="action-card" id="btnUpdateQty">
+            <div class="ac-icon" style="background:var(--info-light);color:var(--info);"><i class="fa-solid fa-sliders"></i></div>
+            <div class="ac-label">Update Quantity</div><div class="ac-desc">Set exact amount</div>
+          </div>
+          <div class="action-card" id="btnLowStock">
+            <div class="ac-icon" style="background:var(--warning-light);color:var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="ac-label">Low Stock Alert</div><div class="ac-desc"><span id="lowCount">0</span> items need attention</div>
+          </div>
+          <div class="action-card" id="btnViewInv">
+            <div class="ac-icon" style="background:var(--honda-red-pale);color:var(--honda-red);"><i class="fa-solid fa-list-ul"></i></div>
+            <div class="ac-label">View Inventory</div><div class="ac-desc">Full stock list</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="all"><i class="fa-solid fa-list-ul"></i> Inventory List</button>
+          <button class="tab-btn" data-tab="logs"><i class="fa-solid fa-clock-rotate-left"></i> Movement Log</button>
+          <button class="tab-btn" data-tab="low"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</button>
+        </div>
+
+        <!-- All Inventory -->
+        <div id="tab-all">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-warehouse"></i> Current Stock Levels</h3>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <div class="search-bar" style="width:200px;"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="invSearch" placeholder="Search..."/></div>
+                <select id="invTypeFilter" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;">
+                  <option value="">All Types</option><option value="vehicle">Vehicles</option><option value="part">Parts</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>ID</th><th>Item Name</th><th>Type</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="invListBody"><tr><td colspan="8" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Movement Log -->
+        <div id="tab-logs" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Stock Movement Log</h3>
+              <span class="badge badge-dark" id="logCount">0 entries</span>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Type</th><th>Item</th><th>Item Type</th><th>Qty</th><th>Before</th><th>After</th><th>Notes</th><th>Date</th></tr></thead>
+                <tbody id="logBody"><tr><td colspan="8" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div id="tab-low" style="display:none;">
+          <div class="card">
+            <div class="card-header"><h3 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);"></i> Low Stock Items</h3></div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Item</th><th>Type</th><th>Stock</th><th>Threshold</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="lowBody"><tr><td colspan="6" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Stock In/Out Modal -->
+  <div class="modal-overlay" id="stockModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="stockModalTitle"><i class="fa-solid fa-arrow-down"></i> Stock In</h3>
+        <button class="modal-close" id="closeStockModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="stockType" value="stock_in"/>
+        <div class="form-group">
+          <label>Item Type *</label>
+          <select id="stockItemType"><option value="">Select type</option><option value="vehicle">Vehicle</option><option value="part">Part / Accessory</option></select>
+        </div>
+        <div class="form-group">
+          <label>Item *</label>
+          <select id="stockItem"><option value="">Select item</option></select>
+        </div>
+        <div class="form-group">
+          <label>Quantity *</label>
+          <div class="input-wrap"><i class="fa-solid fa-hashtag icon"></i>
+            <input type="number" id="stockQty" placeholder="Enter quantity" min="1"/>
+          </div>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="stockNotes" placeholder="Optional notes"></textarea></div>
+        <div id="stockPreview" style="display:none;padding:10px 13px;background:var(--info-light);border:1px solid rgba(21,101,192,.2);border-radius:var(--radius-sm);font-size:.875rem;color:var(--info);">
+          <i class="fa-solid fa-circle-info"></i> <span id="stockPreviewText"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelStockModal">Cancel</button>
+        <button class="btn btn-red" id="saveStock"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Qty Modal -->
+  <div class="modal-overlay" id="updateModal">
+    <div class="modal" style="max-width:430px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-sliders"></i> Update Stock Quantity</h3>
+        <button class="modal-close" id="closeUpdateModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Item Type *</label>
+          <select id="updateItemType"><option value="">Select type</option><option value="vehicle">Vehicle</option><option value="part">Part / Accessory</option></select>
+        </div>
+        <div class="form-group"><label>Item *</label><select id="updateItem"><option value="">Select item</option></select></div>
+        <div class="form-group"><label>New Quantity *</label>
+          <div class="input-wrap"><i class="fa-solid fa-boxes-stacked icon"></i>
+            <input type="number" id="updateQty" placeholder="New stock quantity" min="0"/>
+          </div>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="updateNotes" placeholder="Reason for adjustment"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelUpdateModal">Cancel</button>
+        <button class="btn btn-red" id="saveUpdate"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast, formatCurrency, formatDateTime, stockBadge } from "./js/auth-guard.js";
+    import { collection, getDocs, updateDoc, addDoc, doc, orderBy, query, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    const { user } = await requireAuth(); initSidebar();
+    document.getElementById('logoutBtn').addEventListener('click', async e=>{ e.preventDefault(); await logoutUser(); });
+
+    let allVehicles=[], allParts=[];
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        ['tab-all','tab-logs','tab-low'].forEach(id=>document.getElementById(id).style.display='none');
+        btn.classList.add('active');
+        document.getElementById('tab-'+btn.dataset.tab).style.display='block';
+        if(btn.dataset.tab==='logs') loadLogs();
+      });
+    });
+
+    // URL params
+    if(new URLSearchParams(location.search).get('action')==='stockin') setTimeout(()=>document.getElementById('btnStockIn').click(),500);
+
+    async function loadAll(){
+      const [vS,pS]=await Promise.all([getDocs(query(collection(db,'vehicles'),orderBy('name'))),getDocs(query(collection(db,'parts'),orderBy('name')))]);
+      allVehicles=vS.docs.map(d=>({id:d.id,_type:'vehicle',...d.data()}));
+      allParts=pS.docs.map(d=>({id:d.id,_type:'part',...d.data()}));
+      renderInvList([...allVehicles,...allParts]);
+      renderLowStock([...allVehicles,...allParts]);
+      const low=[...allVehicles,...allParts].filter(p=>(p.stock||0)<=(p.lowStockThreshold||(p._type==='vehicle'?5:10)));
+      document.getElementById('lowCount').textContent=low.length;
+    }
+
+    function renderInvList(items){
+      const tb=document.getElementById('invListBody');
+      if(!items.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="ei">📦</div><h3>No items found</h3></div></td></tr>`;return;}
+      let idx=1;
+      tb.innerHTML=items.map(p=>{
+        const threshold=p.lowStockThreshold||(p._type==='vehicle'?5:10);
+        const prefix=p._type==='vehicle'?'V':'P';
+        return`<tr>
+          <td><span class="inv-id">${prefix}${String(idx++).padStart(3,'0')}</span></td>
+          <td><div class="td-name">${p.name}</div>${p.model?`<div style="font-size:.75rem;color:var(--gray-400);">${p.model} ${p.year||''}</div>`:''}</td>
+          <td><span class="badge ${p._type==='vehicle'?'badge-red':'badge-dark'}">${p._type==='vehicle'?'Vehicle':'Part'}</span></td>
+          <td><span class="badge badge-dark" style="font-size:.65rem;">${p.categoryName||'—'}</span></td>
+          <td class="fw-700 text-red">${formatCurrency(p.price)}</td>
+          <td class="fw-700">${p.stock??0}</td>
+          <td>${stockBadge(p.stock,threshold)}</td>
+          <td><div class="td-actions">
+            <button class="btn btn-success btn-icon" title="Stock In"  onclick="quickIn('${p.id}','${p._type}')"><i class="fa-solid fa-plus"></i></button>
+            <button class="btn btn-danger btn-icon"  title="Stock Out" onclick="quickOut('${p.id}','${p._type}')"><i class="fa-solid fa-minus"></i></button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderLowStock(items){
+      const low=items.filter(p=>(p.stock||0)<=(p.lowStockThreshold||(p._type==='vehicle'?5:10)));
+      const tb=document.getElementById('lowBody');
+      if(!low.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-state" style="padding:36px;"><div style="font-size:42px;margin-bottom:10px;">✅</div><h3 style="color:var(--success);">All items are well-stocked!</h3></div></td></tr>`;return;}
+      tb.innerHTML=low.map(p=>`<tr>
+        <td class="td-name">${p.name}</td>
+        <td><span class="badge ${p._type==='vehicle'?'badge-red':'badge-dark'}">${p._type==='vehicle'?'Vehicle':'Part'}</span></td>
+        <td class="fw-700" style="color:var(--danger);font-size:1rem;">${p.stock??0}</td>
+        <td>${p.lowStockThreshold||(p._type==='vehicle'?5:10)}</td>
+        <td><span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Low</span></td>
+        <td><button class="btn btn-success btn-sm" onclick="quickIn('${p.id}','${p._type}')"><i class="fa-solid fa-plus"></i> Restock</button></td>
+      </tr>`).join('');
+    }
+
+    async function loadLogs(){
+      const snap=await getDocs(query(collection(db,'inventory_logs'),orderBy('createdAt','desc'),limit(60)));
+      document.getElementById('logCount').textContent=`${snap.size} entries`;
+      const tb=document.getElementById('logBody');
+      if(snap.empty){tb.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="ei">📋</div><h3>No logs yet</h3></div></td></tr>`;return;}
+      tb.innerHTML=snap.docs.map(d=>{
+        const l=d.data(), isIn=l.type==='stock_in';
+        return`<tr>
+          <td>${isIn?'<span class="badge badge-success"><i class="fa-solid fa-arrow-down"></i> In</span>':l.type==='adjustment'?'<span class="badge badge-info"><i class="fa-solid fa-sliders"></i> Adj</span>':'<span class="badge badge-danger"><i class="fa-solid fa-arrow-up"></i> Out</span>'}</td>
+          <td class="td-name" style="font-size:.875rem;">${l.itemName||'—'}</td>
+          <td><span class="badge badge-dark" style="font-size:.65rem;">${l.itemType||'—'}</span></td>
+          <td class="fw-700" style="color:${isIn?'var(--success)':'var(--danger)'};">${isIn?'+':'-'}${l.quantity??0}</td>
+          <td>${l.previousStock??'—'}</td><td>${l.newStock??'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${l.notes||'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(l.createdAt)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('invSearch').addEventListener('input',e=>{
+      const q=e.target.value.toLowerCase();
+      const type=document.getElementById('invTypeFilter').value;
+      const all=[...allVehicles,...allParts];
+      renderInvList(all.filter(p=>{
+        const mS=p.name.toLowerCase().includes(q)||(p.model||'').toLowerCase().includes(q);
+        const mT=!type||p._type===type;
+        return mS&&mT;
+      }));
+    });
+    document.getElementById('invTypeFilter').addEventListener('change',e=>{
+      const type=e.target.value;
+      const q=document.getElementById('invSearch').value.toLowerCase();
+      const all=[...allVehicles,...allParts];
+      renderInvList(all.filter(p=>(!type||p._type===type)&&(p.name.toLowerCase().includes(q))));
+    });
+
+    // Populate selects by type
+    function populateItemSelect(selId, type){
+      const sel=document.getElementById(selId);
+      sel.innerHTML='<option value="">Select item</option>';
+      const list=type==='vehicle'?allVehicles:allParts;
+      list.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=`${p.name} (Stock: ${p.stock??0})`; sel.appendChild(o); });
+    }
+    ['stockItemType','updateItemType'].forEach(id=>{
+      document.getElementById(id).addEventListener('change',e=>{
+        const map={stockItemType:'stockItem',updateItemType:'updateItem'};
+        populateItemSelect(map[id],e.target.value);
+      });
+    });
+
+    function openStockModal(type){
+      document.getElementById('stockType').value=type;
+      document.getElementById('stockModalTitle').innerHTML=type==='stock_in'
+        ?'<i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Stock In'
+        :'<i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Stock Out';
+      document.getElementById('stockPreview').style.display='none';
+      document.getElementById('stockModal').classList.add('open');
+    }
+    document.getElementById('btnStockIn').addEventListener('click',()=>openStockModal('stock_in'));
+    document.getElementById('btnStockOut').addEventListener('click',()=>openStockModal('stock_out'));
+    document.getElementById('closeStockModal').addEventListener('click',()=>document.getElementById('stockModal').classList.remove('open'));
+    document.getElementById('cancelStockModal').addEventListener('click',()=>document.getElementById('stockModal').classList.remove('open'));
+    window.quickIn =(id,type)=>{ document.getElementById('stockItemType').value=type; populateItemSelect('stockItem',type); document.getElementById('stockItem').value=id; openStockModal('stock_in'); };
+    window.quickOut=(id,type)=>{ document.getElementById('stockItemType').value=type; populateItemSelect('stockItem',type); document.getElementById('stockItem').value=id; openStockModal('stock_out'); };
+
+    function updatePreview(){
+      const itype=document.getElementById('stockItemType').value;
+      const iid=document.getElementById('stockItem').value;
+      const qty=parseInt(document.getElementById('stockQty').value)||0;
+      const stype=document.getElementById('stockType').value;
+      const prev=document.getElementById('stockPreview');
+      if(!iid||!qty){prev.style.display='none';return;}
+      const list=itype==='vehicle'?allVehicles:allParts;
+      const item=list.find(x=>x.id===iid);
+      if(!item){prev.style.display='none';return;}
+      const nS=stype==='stock_in'?item.stock+qty:Math.max(0,item.stock-qty);
+      document.getElementById('stockPreviewText').textContent=`${item.name}: ${item.stock} → ${nS}`;
+      prev.style.display='block';
+    }
+    document.getElementById('stockItem').addEventListener('change',updatePreview);
+    document.getElementById('stockQty').addEventListener('input',updatePreview);
+
+    document.getElementById('saveStock').addEventListener('click',async()=>{
+      const itype=document.getElementById('stockItemType').value;
+      const iid=document.getElementById('stockItem').value;
+      const qty=parseInt(document.getElementById('stockQty').value)||0;
+      const stype=document.getElementById('stockType').value;
+      const notes=document.getElementById('stockNotes').value.trim();
+      if(!itype){showToast('Validation','Select item type.','warning');return;}
+      if(!iid){showToast('Validation','Select an item.','warning');return;}
+      if(qty<=0){showToast('Validation','Quantity must be > 0.','warning');return;}
+      const list=itype==='vehicle'?allVehicles:allParts;
+      const item=list.find(x=>x.id===iid);
+      const nS=stype==='stock_in'?item.stock+qty:Math.max(0,item.stock-qty);
+      const btn=document.getElementById('saveStock');
+      btn.disabled=true; btn.innerHTML='<span class="spinner" style="width:15px;height:15px;border-width:2px;"></span>';
+      try{
+        await updateDoc(doc(db,itype==='vehicle'?'vehicles':'parts',iid),{stock:nS,updatedAt:serverTimestamp()});
+        await addDoc(collection(db,'inventory_logs'),{type:stype,itemId:iid,itemName:item.name,itemType:itype,quantity:qty,previousStock:item.stock,newStock:nS,notes,createdAt:serverTimestamp(),createdBy:user.uid});
+        showToast('Success',`Stock ${stype==='stock_in'?'added':'removed'} for "${item.name}".`,'success');
+        document.getElementById('stockModal').classList.remove('open');
+        document.getElementById('stockQty').value=''; document.getElementById('stockNotes').value='';
+        document.getElementById('stockPreview').style.display='none';
+        await loadAll();
+      }catch{ showToast('Error','Failed to update.','error'); }
+      finally{ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save'; }
+    });
+
+    document.getElementById('btnUpdateQty').addEventListener('click',()=>document.getElementById('updateModal').classList.add('open'));
+    document.getElementById('closeUpdateModal').addEventListener('click',()=>document.getElementById('updateModal').classList.remove('open'));
+    document.getElementById('cancelUpdateModal').addEventListener('click',()=>document.getElementById('updateModal').classList.remove('open'));
+    document.getElementById('saveUpdate').addEventListener('click',async()=>{
+      const itype=document.getElementById('updateItemType').value;
+      const iid=document.getElementById('updateItem').value;
+      const qty=parseInt(document.getElementById('updateQty').value);
+      const notes=document.getElementById('updateNotes').value.trim();
+      if(!itype||!iid){showToast('Validation','Select item type and item.','warning');return;}
+      if(isNaN(qty)||qty<0){showToast('Validation','Enter valid quantity.','warning');return;}
+      const list=itype==='vehicle'?allVehicles:allParts;
+      const item=list.find(x=>x.id===iid);
+      try{
+        await updateDoc(doc(db,itype==='vehicle'?'vehicles':'parts',iid),{stock:qty,updatedAt:serverTimestamp()});
+        await addDoc(collection(db,'inventory_logs'),{type:'adjustment',itemId:iid,itemName:item.name,itemType:itype,quantity:Math.abs(qty-item.stock),previousStock:item.stock,newStock:qty,notes:notes||'Manual adjustment',createdAt:serverTimestamp(),createdBy:user.uid});
+        showToast('Updated',`Stock for "${item.name}" set to ${qty}.`,'success');
+        document.getElementById('updateModal').classList.remove('open');
+        await loadAll();
+      }catch{ showToast('Error','Failed to update.','error'); }
+    });
+
+    document.getElementById('btnLowStock').addEventListener('click',()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');if(b.dataset.tab==='low')b.classList.add('active');});
+      ['tab-all','tab-logs','tab-low'].forEach(id=>document.getElementById(id).style.display='none');
+      document.getElementById('tab-low').style.display='block';
+    });
+    document.getElementById('btnViewInv').addEventListener('click',()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');if(b.dataset.tab==='all')b.classList.add('active');});
+      ['tab-all','tab-logs','tab-low'].forEach(id=>document.getElementById(id).style.display='none');
+      document.getElementById('tab-all').style.display='block';
+    });
+
+    await loadAll();
+  </script>
+</body>
+</html>

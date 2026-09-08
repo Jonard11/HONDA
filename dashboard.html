@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Dashboard</h1><p id="todayDate"></p></div>
+        <div class="topbar-actions">
+          <a href="inventory.html" class="topbar-btn" title="Low Stock Alerts">
+            <i class="fa-solid fa-bell"></i><span class="notif-dot" id="notifDot" style="display:none;"></span>
+          </a>
+          <a href="profile.html" class="topbar-btn"><i class="fa-solid fa-user"></i></a>
+        </div>
+      </header>
+      <main class="page-content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div>
+            <h2>Welcome back, <span id="welcomeName">Admin</span>!</h2>
+            <p>Honda Inventory System — Manage your vehicles and parts efficiently.</p>
+            <div class="banner-date" id="bannerDate"></div>
+          </div>
+          <i class="fa-solid fa-motorcycle banner-icon"></i>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon red"><i class="fa-solid fa-motorcycle"></i></div>
+            <div><div class="stat-value" id="statVehicles">—</div><div class="stat-label">Total Vehicles</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon dark"><i class="fa-solid fa-gears"></i></div>
+            <div><div class="stat-value" id="statParts">—</div><div class="stat-label">Total Parts</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div><div class="stat-value" id="statStock">—</div><div class="stat-label">Available Stock</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div><div class="stat-value" id="statLow">—</div><div class="stat-label">Low Stock Items</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><i class="fa-solid fa-peso-sign"></i></div>
+            <div><div class="stat-value" id="statSales">—</div><div class="stat-label">Today's Sales</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-database"></i></div>
+            <div><div class="stat-value" id="statValue">—</div><div class="stat-label">Inventory Value</div></div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="dashboard-grid">
+          <!-- Recent Transactions -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Recent Transactions</h3>
+              <a href="sales.html" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Order #</th><th>Items</th><th>Amount</th><th>Date</th></tr></thead>
+                <tbody id="recentSalesBody">
+                  <tr><td colspan="4" style="text-align:center;padding:28px;color:var(--gray-400);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Low Stock -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);"></i> Low Stock Alert</h3>
+              <a href="inventory.html" class="btn btn-outline btn-sm">Manage</a>
+            </div>
+            <div class="card-body" style="padding:14px;">
+              <div class="low-stock-list" id="lowStockList">
+                <div style="text-align:center;padding:20px;color:var(--gray-400);">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mt-20">
+          <div class="card-header"><h3 class="card-title"><i class="fa-solid fa-bolt"></i> Quick Actions</h3></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+              <a href="vehicles.html?action=add"      class="btn btn-red"><i class="fa-solid fa-plus"></i> Add Vehicle</a>
+              <a href="parts.html?action=add"         class="btn btn-black"><i class="fa-solid fa-plus"></i> Add Part</a>
+              <a href="sales.html?action=record"      class="btn btn-success"><i class="fa-solid fa-cash-register"></i> Record Sale</a>
+              <a href="inventory.html?action=stockin" class="btn btn-outline"><i class="fa-solid fa-arrow-down"></i> Stock In</a>
+              <a href="logs.html"                     class="btn btn-ghost"><i class="fa-solid fa-clock-rotate-left"></i> View Logs</a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, formatCurrency, formatDateTime } from "./js/auth-guard.js";
+    import { collection, getDocs, query, orderBy, limit, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    const { displayName } = await requireAuth();
+    initSidebar();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('welcomeName').textContent = displayName;
+    document.getElementById('todayDate').textContent   = dateStr;
+    document.getElementById('bannerDate').textContent  = dateStr;
+    document.getElementById('logoutBtn').addEventListener('click', async e => { e.preventDefault(); await logoutUser(); });
+
+    async function loadStats() {
+      try {
+        const [vSnap, pSnap] = await Promise.all([
+          getDocs(collection(db,'vehicles')),
+          getDocs(collection(db,'parts'))
+        ]);
+        let totalStock=0, lowCount=0, invValue=0;
+        const lowItems=[];
+        [...vSnap.docs, ...pSnap.docs].forEach(d => {
+          const p=d.data(), col=vSnap.docs.includes(d)?'vehicles':'parts';
+          totalStock += p.stock||0;
+          invValue   += (p.price||0)*(p.stock||0);
+          if((p.stock||0)<=(p.lowStockThreshold||5)){ lowCount++; lowItems.push({...p,id:d.id,_col:col}); }
+        });
+        document.getElementById('statVehicles').textContent = vSnap.size;
+        document.getElementById('statParts').textContent    = pSnap.size;
+        document.getElementById('statStock').textContent    = totalStock;
+        document.getElementById('statLow').textContent      = lowCount;
+        document.getElementById('statValue').textContent    = formatCurrency(invValue);
+        if(lowCount>0) document.getElementById('notifDot').style.display='block';
+
+        const ll = document.getElementById('lowStockList');
+        ll.innerHTML = lowItems.length===0
+          ? '<div style="text-align:center;padding:20px;color:var(--success);"><i class="fa-solid fa-circle-check" style="font-size:26px;display:block;margin-bottom:8px;"></i>All items are well-stocked!</div>'
+          : lowItems.slice(0,6).map(p=>`<div class="low-item">
+              <div><div class="li-name">${p.name}</div><div class="li-cat">${p.categoryName||p._col}</div></div>
+              <span class="badge badge-danger">Stock: ${p.stock}</span>
+            </div>`).join('');
+
+        const today=new Date(); today.setHours(0,0,0,0);
+        const sSnap=await getDocs(query(collection(db,'sales'),where('createdAt','>=',Timestamp.fromDate(today))));
+        let todaySales=0;
+        sSnap.forEach(d=>{ todaySales+=d.data().totalAmount||0; });
+        document.getElementById('statSales').textContent=formatCurrency(todaySales);
+
+        const rSnap=await getDocs(query(collection(db,'sales'),orderBy('createdAt','desc'),limit(5)));
+        const tbody=document.getElementById('recentSalesBody');
+        tbody.innerHTML=rSnap.empty
+          ?'<tr><td colspan="4"><div class="empty-state" style="padding:24px;"><div class="ei">🛒</div><p>No transactions yet</p></div></td></tr>'
+          :rSnap.docs.map(d=>{const s=d.data();return`<tr>
+            <td class="td-name" style="font-size:.8rem;">${s.orderNumber||d.id.slice(-6).toUpperCase()}</td>
+            <td>${s.totalQuantity||0} items</td>
+            <td class="text-red fw-700">${formatCurrency(s.totalAmount)}</td>
+            <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(s.createdAt)}</td>
+          </tr>`;}).join('');
+      } catch(err){ console.error(err); }
+    }
+    loadStats();
+  </script>
+</body>
+</html>

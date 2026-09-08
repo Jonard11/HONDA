@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item active"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Sales &amp; Transactions</h1><p>Record sales and view reports</p></div>
+        <div class="topbar-actions">
+          <button class="btn btn-red btn-sm" id="openRecordSale"><i class="fa-solid fa-plus"></i> Record Sale</button>
+        </div>
+      </header>
+      <main class="page-content">
+        <!-- Today Summary -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;">
+          <div style="background:var(--white);border-radius:var(--radius-md);padding:16px;border:1px solid var(--gray-100);text-align:center;box-shadow:var(--shadow-sm);">
+            <div style="font-size:.75rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Orders Today</div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--honda-red);margin-top:4px;" id="todayOrders">—</div>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius-md);padding:16px;border:1px solid var(--gray-100);text-align:center;box-shadow:var(--shadow-sm);">
+            <div style="font-size:.75rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Sales Today</div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--honda-red);margin-top:4px;" id="todaySales">—</div>
+          </div>
+          <div style="background:var(--white);border-radius:var(--radius-md);padding:16px;border:1px solid var(--gray-100);text-align:center;box-shadow:var(--shadow-sm);">
+            <div style="font-size:.75rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Qty Sold Today</div>
+            <div style="font-size:1.5rem;font-weight:900;color:var(--honda-red);margin-top:4px;" id="todayQty">—</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:22px;">
+          <div class="action-card" id="btnRecord"><div class="ac-icon" style="background:var(--honda-red-pale);color:var(--honda-red);"><i class="fa-solid fa-cash-register"></i></div><div class="ac-label">Record Sale</div><div class="ac-desc">New transaction</div></div>
+          <div class="action-card" id="btnViewTrans"><div class="ac-icon" style="background:var(--success-light);color:var(--success);"><i class="fa-solid fa-list-ul"></i></div><div class="ac-label">View Transactions</div><div class="ac-desc">Browse all sales</div></div>
+          <div class="action-card" id="btnQtySold"><div class="ac-icon" style="background:var(--info-light);color:var(--info);"><i class="fa-solid fa-chart-bar"></i></div><div class="ac-label">Quantity Sold</div><div class="ac-desc">Product performance</div></div>
+          <div class="action-card" id="btnDaily"><div class="ac-icon" style="background:var(--warning-light);color:var(--warning);"><i class="fa-solid fa-calendar-days"></i></div><div class="ac-label">Daily Sales Report</div><div class="ac-desc">Filter by date</div></div>
+          <div class="action-card" id="btnMonthly"><div class="ac-icon" style="background:rgba(10,10,10,.06);color:var(--black);"><i class="fa-solid fa-calendar-week"></i></div><div class="ac-label">Monthly Report</div><div class="ac-desc">Filter by month</div></div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="card" id="transSection">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> All Transactions</h3>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="date" id="filterDate" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;"/>
+              <input type="month" id="filterMonth" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;"/>
+              <button class="btn btn-ghost btn-sm" id="clearFilter"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Qty</th><th>Total</th><th>Date</th><th></th></tr></thead>
+              <tbody id="salesBody"><tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="card-footer" id="salesFooter" style="display:none;">
+            <div style="display:flex;justify-content:flex-end;gap:20px;font-size:.875rem;">
+              <span style="color:var(--gray-400);">Filtered Total:</span>
+              <span class="fw-800 text-red" id="filteredTotal"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qty Sold Report -->
+        <div class="card" id="qtySoldSection" style="display:none;">
+          <div class="card-header"><h3 class="card-title"><i class="fa-solid fa-chart-bar"></i> Quantity Sold by Item</h3></div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Item</th><th>Type</th><th>Total Qty Sold</th><th>Total Revenue</th></tr></thead>
+              <tbody id="qtySoldBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Record Sale Modal -->
+  <div class="modal-overlay" id="saleModal">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-cash-register"></i> Record Sale</h3>
+        <button class="modal-close" id="closeSaleModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Customer Name (optional)</label>
+          <div class="input-wrap"><i class="fa-solid fa-user icon"></i>
+            <input type="text" id="customerName" placeholder="e.g. Juan dela Cruz"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;">
+          <select id="saleItemType" style="flex:1;min-width:120px;padding:8px 11px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.875rem;background:var(--gray-50);outline:none;">
+            <option value="">Type</option><option value="vehicle">Vehicle</option><option value="part">Part</option>
+          </select>
+          <select id="saleItem" style="flex:2;min-width:160px;padding:8px 11px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.875rem;background:var(--gray-50);outline:none;">
+            <option value="">Select item</option>
+          </select>
+          <div class="input-wrap" style="width:80px;"><i class="fa-solid fa-hashtag icon"></i>
+            <input type="number" id="saleQty" placeholder="Qty" min="1" value="1" style="padding:8px 8px 8px 30px;"/>
+          </div>
+          <button class="btn btn-red btn-sm" id="addItem"><i class="fa-solid fa-plus"></i> Add</button>
+        </div>
+        <!-- Cart -->
+        <div style="min-height:80px;border:2px dashed var(--gray-200);border-radius:var(--radius-md);padding:11px;margin-bottom:13px;">
+          <div id="cartEmpty" style="text-align:center;color:var(--gray-400);padding:18px;font-size:.875rem;">
+            <i class="fa-solid fa-cart-shopping" style="font-size:26px;display:block;margin-bottom:7px;opacity:.35;"></i>
+            Add items to start the sale
+          </div>
+          <div id="cartItems"></div>
+        </div>
+        <!-- Total -->
+        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--black);padding:13px 16px;border-radius:var(--radius-md);margin-bottom:13px;">
+          <span style="font-weight:700;color:rgba(255,255,255,.7);font-size:.875rem;">TOTAL AMOUNT</span>
+          <span style="font-size:1.375rem;font-weight:900;color:var(--white);" id="saleTotal">₱0.00</span>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Notes (optional)</label>
+          <textarea id="saleNotes" placeholder="Additional notes" style="min-height:60px;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelSaleModal">Cancel</button>
+        <button class="btn btn-success" id="confirmSale"><i class="fa-solid fa-check"></i> Confirm Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sale Detail Modal -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-receipt"></i> Sale Details</h3>
+        <button class="modal-close" id="closeDetailModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" id="closeDetailBtn">Close</button></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast, formatCurrency, formatDateTime, generateOrderNumber } from "./js/auth-guard.js";
+    import { collection, getDocs, addDoc, updateDoc, doc, orderBy, query, serverTimestamp, where, Timestamp, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    const { user } = await requireAuth(); initSidebar();
+    document.getElementById('logoutBtn').addEventListener('click', async e=>{ e.preventDefault(); await logoutUser(); });
+
+    let allV=[], allP=[], allSales=[], cart=[];
+    if(new URLSearchParams(location.search).get('action')==='record') setTimeout(openSaleModal,500);
+
+    async function loadItems(){
+      const [vs,ps]=await Promise.all([getDocs(query(collection(db,'vehicles'),orderBy('name'))),getDocs(query(collection(db,'parts'),orderBy('name')))]);
+      allV=vs.docs.map(d=>({id:d.id,_type:'vehicle',...d.data()}));
+      allP=ps.docs.map(d=>({id:d.id,_type:'part',...d.data()}));
+    }
+    async function loadSales(){
+      const snap=await getDocs(query(collection(db,'sales'),orderBy('createdAt','desc'),limit(100)));
+      allSales=snap.docs.map(d=>({id:d.id,...d.data()}));
+      calcToday(); renderTable(allSales);
+    }
+    function calcToday(){
+      const today=new Date(); today.setHours(0,0,0,0);
+      const t=allSales.filter(s=>{if(!s.createdAt)return false;const d=s.createdAt.toDate?s.createdAt.toDate():new Date(s.createdAt);return d>=today;});
+      document.getElementById('todayOrders').textContent=t.length;
+      document.getElementById('todaySales').textContent=formatCurrency(t.reduce((sum,s)=>sum+(s.totalAmount||0),0));
+      document.getElementById('todayQty').textContent=t.reduce((sum,s)=>sum+(s.totalQuantity||0),0);
+    }
+    function renderTable(sales){
+      const tb=document.getElementById('salesBody');
+      if(!sales.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="ei">🛒</div><h3>No transactions yet</h3><p>Record your first sale.</p></div></td></tr>`;return;}
+      tb.innerHTML=sales.map(s=>`<tr>
+        <td class="td-name" style="font-size:.8rem;">${s.orderNumber||s.id.slice(-6).toUpperCase()}</td>
+        <td style="font-size:.8rem;">${s.customerName||'—'}</td>
+        <td style="font-size:.78rem;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(s.items||[]).map(i=>`${i.itemName} ×${i.quantity}`).join(', ')||'—'}</td>
+        <td class="fw-700">${s.totalQuantity||0}</td>
+        <td class="fw-700 text-red">${formatCurrency(s.totalAmount)}</td>
+        <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(s.createdAt)}</td>
+        <td><button class="btn btn-outline btn-icon" onclick="viewDetail('${s.id}')"><i class="fa-solid fa-eye"></i></button></td>
+      </tr>`).join('');
+    }
+
+    // Filters
+    document.getElementById('filterDate').addEventListener('change',e=>{
+      const val=e.target.value; document.getElementById('filterMonth').value='';
+      if(!val){renderTable(allSales);document.getElementById('salesFooter').style.display='none';return;}
+      const f=allSales.filter(s=>{if(!s.createdAt)return false;const d=s.createdAt.toDate?s.createdAt.toDate():new Date(s.createdAt);return d.toISOString().slice(0,10)===val;});
+      renderTable(f);
+      document.getElementById('filteredTotal').textContent=formatCurrency(f.reduce((sum,s)=>sum+(s.totalAmount||0),0));
+      document.getElementById('salesFooter').style.display='flex';
+    });
+    document.getElementById('filterMonth').addEventListener('change',e=>{
+      const val=e.target.value; document.getElementById('filterDate').value='';
+      if(!val){renderTable(allSales);document.getElementById('salesFooter').style.display='none';return;}
+      const f=allSales.filter(s=>{if(!s.createdAt)return false;const d=s.createdAt.toDate?s.createdAt.toDate():new Date(s.createdAt);return d.toISOString().slice(0,7)===val;});
+      renderTable(f);
+      document.getElementById('filteredTotal').textContent=formatCurrency(f.reduce((sum,s)=>sum+(s.totalAmount||0),0));
+      document.getElementById('salesFooter').style.display='flex';
+    });
+    document.getElementById('clearFilter').addEventListener('click',()=>{
+      document.getElementById('filterDate').value=''; document.getElementById('filterMonth').value='';
+      renderTable(allSales); document.getElementById('salesFooter').style.display='none';
+    });
+
+    window.viewDetail=(id)=>{
+      const s=allSales.find(x=>x.id===id); if(!s) return;
+      document.getElementById('detailBody').innerHTML=`
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Order #</span><span class="fw-800">${s.orderNumber||s.id.slice(-8).toUpperCase()}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Customer</span><span class="fw-700">${s.customerName||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Date</span><span>${formatDateTime(s.createdAt)}</span></div>
+          ${s.notes?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-400);font-size:.875rem;">Notes</span><span>${s.notes}</span></div>`:''}
+        </div>
+        <div class="divider"></div>
+        <table style="width:100%;margin-bottom:13px;">
+          <thead><tr>
+            <th style="padding:7px;text-align:left;font-size:.7rem;color:var(--gray-400);">Item</th>
+            <th style="padding:7px;text-align:center;font-size:.7rem;color:var(--gray-400);">Qty</th>
+            <th style="padding:7px;text-align:right;font-size:.7rem;color:var(--gray-400);">Price</th>
+            <th style="padding:7px;text-align:right;font-size:.7rem;color:var(--gray-400);">Subtotal</th>
+          </tr></thead>
+          <tbody>${(s.items||[]).map(i=>`<tr>
+            <td style="padding:7px;font-size:.875rem;">${i.itemName}</td>
+            <td style="padding:7px;text-align:center;">${i.quantity}</td>
+            <td style="padding:7px;text-align:right;">${formatCurrency(i.price)}</td>
+            <td style="padding:7px;text-align:right;font-weight:700;">${formatCurrency(i.subtotal)}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;">
+          <span style="font-weight:800;font-size:1rem;">TOTAL</span>
+          <span style="font-size:1.25rem;font-weight:900;color:var(--honda-red);">${formatCurrency(s.totalAmount)}</span>
+        </div>`;
+      document.getElementById('detailModal').classList.add('open');
+    };
+    document.getElementById('closeDetailModal').addEventListener('click',()=>document.getElementById('detailModal').classList.remove('open'));
+    document.getElementById('closeDetailBtn').addEventListener('click',()=>document.getElementById('detailModal').classList.remove('open'));
+
+    // Quick actions
+    document.getElementById('btnRecord').addEventListener('click',openSaleModal);
+    document.getElementById('openRecordSale').addEventListener('click',openSaleModal);
+    document.getElementById('btnViewTrans').addEventListener('click',()=>{ document.getElementById('transSection').style.display='block'; document.getElementById('qtySoldSection').style.display='none'; });
+    document.getElementById('btnQtySold').addEventListener('click',()=>{ document.getElementById('transSection').style.display='none'; document.getElementById('qtySoldSection').style.display='block'; renderQtySold(); });
+    document.getElementById('btnDaily').addEventListener('click',()=>{
+      document.getElementById('transSection').style.display='block'; document.getElementById('qtySoldSection').style.display='none';
+      document.getElementById('filterDate').value=new Date().toISOString().slice(0,10);
+      document.getElementById('filterDate').dispatchEvent(new Event('change'));
+    });
+    document.getElementById('btnMonthly').addEventListener('click',()=>{
+      document.getElementById('transSection').style.display='block'; document.getElementById('qtySoldSection').style.display='none';
+      document.getElementById('filterMonth').value=new Date().toISOString().slice(0,7);
+      document.getElementById('filterMonth').dispatchEvent(new Event('change'));
+    });
+
+    function renderQtySold(){
+      const map={};
+      allSales.forEach(s=>(s.items||[]).forEach(i=>{
+        if(!map[i.itemId]) map[i.itemId]={name:i.itemName,type:i.itemType||'—',qty:0,rev:0};
+        map[i.itemId].qty+=i.quantity; map[i.itemId].rev+=i.subtotal||0;
+      }));
+      const rows=Object.values(map).sort((a,b)=>b.qty-a.qty);
+      document.getElementById('qtySoldBody').innerHTML=rows.length
+        ?rows.map(r=>`<tr><td class="td-name">${r.name}</td><td><span class="badge ${r.type==='vehicle'?'badge-red':'badge-dark'}">${r.type}</span></td><td class="fw-800" style="font-size:1.1rem;">${r.qty}</td><td class="fw-700 text-red">${formatCurrency(r.rev)}</td></tr>`).join('')
+        :`<tr><td colspan="4"><div class="empty-state"><div class="ei">📊</div><h3>No data yet</h3></div></td></tr>`;
+    }
+
+    // Sale Modal
+    function openSaleModal(){
+      cart=[]; renderCart(); document.getElementById('customerName').value=''; document.getElementById('saleNotes').value='';
+      document.getElementById('saleModal').classList.add('open');
+    }
+    function closeSaleModal(){ document.getElementById('saleModal').classList.remove('open'); cart=[]; renderCart(); }
+    document.getElementById('closeSaleModal').addEventListener('click',closeSaleModal);
+    document.getElementById('cancelSaleModal').addEventListener('click',closeSaleModal);
+
+    document.getElementById('saleItemType').addEventListener('change',e=>{
+      const type=e.target.value;
+      const sel=document.getElementById('saleItem');
+      sel.innerHTML='<option value="">Select item</option>';
+      const list=type==='vehicle'?allV:allP;
+      list.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=`${p.name} — ${formatCurrency(p.price)} (Stock: ${p.stock??0})`; sel.appendChild(o); });
+    });
+
+    document.getElementById('addItem').addEventListener('click',()=>{
+      const itype=document.getElementById('saleItemType').value;
+      const iid=document.getElementById('saleItem').value;
+      const qty=parseInt(document.getElementById('saleQty').value)||1;
+      if(!iid){showToast('Validation','Select an item.','warning');return;}
+      const list=itype==='vehicle'?allV:allP;
+      const item=list.find(x=>x.id===iid);
+      if(!item) return;
+      const ex=cart.find(x=>x.itemId===iid);
+      if(ex){ex.quantity+=qty;ex.subtotal=ex.quantity*ex.price;}
+      else cart.push({itemId:iid,itemName:item.name,itemType:itype,price:item.price,quantity:qty,subtotal:qty*item.price});
+      document.getElementById('saleQty').value=1;
+      renderCart();
+    });
+
+    function renderCart(){
+      const empty=document.getElementById('cartEmpty');
+      const items=document.getElementById('cartItems');
+      if(!cart.length){empty.style.display='block';items.innerHTML='';document.getElementById('saleTotal').textContent='₱0.00';return;}
+      empty.style.display='none';
+      items.innerHTML=cart.map((it,i)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--gray-50);border-radius:var(--radius-sm);margin-bottom:5px;gap:9px;">
+          <div style="flex:1;">
+            <div class="fw-700" style="font-size:.875rem;">${it.itemName}</div>
+            <div style="font-size:.75rem;color:var(--gray-400);">${formatCurrency(it.price)} × ${it.quantity}</div>
+          </div>
+          <span class="fw-800 text-red">${formatCurrency(it.subtotal)}</span>
+          <button class="btn btn-danger btn-icon" style="width:26px;height:26px;" onclick="removeCartItem(${i})"><i class="fa-solid fa-xmark"></i></button>
+        </div>`).join('');
+      document.getElementById('saleTotal').textContent=formatCurrency(cart.reduce((s,i)=>s+i.subtotal,0));
+    }
+    window.removeCartItem=(i)=>{ cart.splice(i,1); renderCart(); };
+
+    document.getElementById('confirmSale').addEventListener('click',async()=>{
+      if(!cart.length){showToast('Validation','Add at least one item.','warning');return;}
+      const customer=document.getElementById('customerName').value.trim();
+      const notes=document.getElementById('saleNotes').value.trim();
+      const total=cart.reduce((s,i)=>s+i.subtotal,0);
+      const qty=cart.reduce((s,i)=>s+i.quantity,0);
+      const orderNum=generateOrderNumber();
+      const btn=document.getElementById('confirmSale');
+      btn.disabled=true; btn.innerHTML='<span class="spinner" style="width:15px;height:15px;border-width:2px;"></span> Processing...';
+      try{
+        await addDoc(collection(db,'sales'),{orderNumber:orderNum,items:cart,totalAmount:total,totalQuantity:qty,customerName:customer,notes,createdAt:serverTimestamp(),createdBy:user.uid});
+        for(const it of cart){
+          const list=it.itemType==='vehicle'?allV:allP;
+          const item=list.find(x=>x.id===it.itemId);
+          if(item){
+            const nS=Math.max(0,(item.stock||0)-it.quantity);
+            await updateDoc(doc(db,it.itemType==='vehicle'?'vehicles':'parts',it.itemId),{stock:nS});
+            await addDoc(collection(db,'inventory_logs'),{type:'stock_out',itemId:it.itemId,itemName:it.itemName,itemType:it.itemType,quantity:it.quantity,previousStock:item.stock,newStock:nS,notes:`Sale: ${orderNum}`,createdAt:serverTimestamp(),createdBy:user.uid});
+          }
+        }
+        showToast('Sale Recorded!',`${orderNum} — ${formatCurrency(total)}`,'success');
+        closeSaleModal(); await loadItems(); await loadSales();
+      }catch(e){console.error(e);showToast('Error','Failed to record sale.','error');}
+      finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-check"></i> Confirm Sale';}
+    });
+
+    await loadItems(); await loadSales();
+  </script>
+</body>
+</html>

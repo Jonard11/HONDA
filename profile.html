@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item active"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Profile &amp; Settings</h1><p>Manage your account</p></div>
+      </header>
+      <main class="page-content" style="max-width:640px;">
+        <!-- Profile Banner -->
+        <div class="profile-banner">
+          <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+          <div>
+            <h2 id="profileName">Admin</h2>
+            <p id="profileEmail">—</p>
+            <div style="margin-top:7px;"><span class="badge" style="background:rgba(255,255,255,.15);color:var(--white);font-size:.7rem;"><i class="fa-solid fa-shield-halved"></i> Administrator</span></div>
+          </div>
+        </div>
+
+        <!-- Menu -->
+        <div class="profile-menu">
+          <div class="profile-item" id="openEditName">
+            <div class="pi-icon"><i class="fa-solid fa-user-pen"></i></div>
+            <div class="pi-label">Edit Display Name</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </div>
+          <div class="profile-item" id="openChangePwd">
+            <div class="pi-icon"><i class="fa-solid fa-lock"></i></div>
+            <div class="pi-label">Change Password</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </div>
+          <div class="profile-item" id="openSettings">
+            <div class="pi-icon"><i class="fa-solid fa-gear"></i></div>
+            <div class="pi-label">Settings</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </div>
+          <a href="logs.html" class="profile-item" style="text-decoration:none;">
+            <div class="pi-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="pi-label">Activity Logs</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </a>
+          <div class="profile-item" id="openAbout">
+            <div class="pi-icon"><i class="fa-solid fa-circle-info"></i></div>
+            <div class="pi-label">About</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </div>
+          <div class="profile-item danger" id="openLogoutConfirm">
+            <div class="pi-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+            <div class="pi-label">Logout</div>
+            <i class="fa-solid fa-chevron-right pi-arrow"></i>
+          </div>
+        </div>
+
+        <!-- Account Info -->
+        <div class="card mt-20">
+          <div class="card-header"><h3 class="card-title"><i class="fa-solid fa-circle-info"></i> Account Information</h3></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:13px;">
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--gray-100);"><span style="font-size:.8rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Display Name</span><span class="fw-700" id="infoName">—</span></div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--gray-100);"><span style="font-size:.8rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Email</span><span class="fw-700" id="infoEmail">—</span></div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--gray-100);"><span style="font-size:.8rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Role</span><span class="badge badge-red">Administrator</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="font-size:.8rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">System</span><span class="fw-700">Honda Inventory v1.0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="card mt-20" id="settingsPanel" style="display:none;">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-gear"></i> System Settings</h3>
+            <button class="btn btn-ghost btn-sm" id="closeSettings"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Default Low Stock Threshold (Vehicles)</label>
+              <div class="input-wrap"><i class="fa-solid fa-triangle-exclamation icon"></i>
+                <input type="number" id="thresholdV" value="5" min="1"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Default Low Stock Threshold (Parts)</label>
+              <div class="input-wrap"><i class="fa-solid fa-triangle-exclamation icon"></i>
+                <input type="number" id="thresholdP" value="10" min="1"/>
+              </div>
+            </div>
+            <button class="btn btn-red" id="saveSettings"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+          </div>
+        </div>
+
+        <!-- About Panel -->
+        <div class="card mt-20" id="aboutPanel" style="display:none;">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-circle-info"></i> About</h3>
+            <button class="btn btn-ghost btn-sm" id="closeAbout"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="card-body">
+            <div style="text-align:center;padding:10px 0;">
+              <div style="width:64px;height:64px;background:var(--honda-red);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 6px 18px rgba(204,0,0,.3);">
+                <i class="fa-solid fa-motorcycle" style="font-size:28px;color:var(--white);"></i>
+              </div>
+              <div style="font-size:1.25rem;font-weight:900;color:var(--gray-900);">Honda Inventory System</div>
+              <div style="font-size:.8rem;color:var(--gray-400);margin-top:4px;letter-spacing:1px;text-transform:uppercase;">The Power of Dreams</div>
+              <div style="font-size:.8rem;color:var(--gray-400);margin-top:10px;">Version 1.0.0 &bull; Built with Firebase</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Name Modal -->
+  <div class="modal-overlay" id="editNameModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-user-pen"></i> Edit Display Name</h3>
+        <button class="modal-close" id="closeEditName"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Display Name *</label>
+          <div class="input-wrap"><i class="fa-solid fa-user icon"></i>
+            <input type="text" id="newName" placeholder="Enter your name" required/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelEditName">Cancel</button>
+        <button class="btn btn-red" id="saveName"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" id="changePwdModal">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-lock"></i> Change Password</h3>
+        <button class="modal-close" id="closeChangePwd"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" style="padding:10px 13px;border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;font-size:.875rem;margin-bottom:16px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> You will be logged out after changing your password.
+        </div>
+        <div class="form-group"><label>Current Password *</label><div class="input-wrap"><i class="fa-solid fa-lock icon"></i><input type="password" id="currentPwd" placeholder="Current password"/></div></div>
+        <div class="form-group"><label>New Password *</label><div class="input-wrap"><i class="fa-solid fa-key icon"></i><input type="password" id="newPwd" placeholder="Min. 6 characters"/></div></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Confirm Password *</label><div class="input-wrap"><i class="fa-solid fa-key icon"></i><input type="password" id="confirmPwd" placeholder="Confirm new password"/></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelChangePwd">Cancel</button>
+        <button class="btn btn-danger" id="savePwd"><i class="fa-solid fa-lock"></i> Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirm Modal -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal" style="max-width:360px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-right-from-bracket" style="color:var(--danger);"></i> Confirm Logout</h3>
+        <button class="modal-close" id="closeLogoutModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body"><p style="color:var(--gray-700);">Are you sure you want to logout from Honda Inventory System?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelLogout">Stay</button>
+        <button class="btn btn-danger" id="confirmLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast } from "./js/auth-guard.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    const { db } = initFirebase();
+    const { user, displayName, email } = await requireAuth(); initSidebar();
+    const auth = getAuth();
+    document.getElementById('profileName').textContent=displayName; document.getElementById('profileEmail').textContent=email;
+    document.getElementById('infoName').textContent=displayName; document.getElementById('infoEmail').textContent=email;
+    document.getElementById('newName').value=displayName;
+    document.getElementById('logoutBtn').addEventListener('click',async e=>{ e.preventDefault(); await logoutUser(); });
+
+    // Edit Name
+    document.getElementById('openEditName').addEventListener('click',()=>document.getElementById('editNameModal').classList.add('open'));
+    document.getElementById('closeEditName').addEventListener('click',()=>document.getElementById('editNameModal').classList.remove('open'));
+    document.getElementById('cancelEditName').addEventListener('click',()=>document.getElementById('editNameModal').classList.remove('open'));
+    document.getElementById('saveName').addEventListener('click',async()=>{
+      const name=document.getElementById('newName').value.trim();
+      if(!name){showToast('Validation','Name cannot be empty.','warning');return;}
+      const btn=document.getElementById('saveName'); btn.disabled=true;
+      try{
+        await updateProfile(auth.currentUser,{displayName:name});
+        await setDoc(doc(db,'users',user.uid),{displayName:name,email,updatedAt:serverTimestamp()},{merge:true});
+        document.getElementById('profileName').textContent=name; document.getElementById('infoName').textContent=name;
+        document.getElementById('sidebarUserName').textContent=name;
+        document.getElementById('editNameModal').classList.remove('open');
+        showToast('Updated','Display name updated.','success');
+      }catch{showToast('Error','Failed to update name.','error');}
+      finally{btn.disabled=false;}
+    });
+
+    // Change Password
+    document.getElementById('openChangePwd').addEventListener('click',()=>document.getElementById('changePwdModal').classList.add('open'));
+    document.getElementById('closeChangePwd').addEventListener('click',()=>document.getElementById('changePwdModal').classList.remove('open'));
+    document.getElementById('cancelChangePwd').addEventListener('click',()=>document.getElementById('changePwdModal').classList.remove('open'));
+    document.getElementById('savePwd').addEventListener('click',async()=>{
+      const cur=document.getElementById('currentPwd').value;
+      const nw=document.getElementById('newPwd').value;
+      const cf=document.getElementById('confirmPwd').value;
+      if(!cur||!nw||!cf){showToast('Validation','Fill all fields.','warning');return;}
+      if(nw.length<6){showToast('Validation','Min. 6 characters.','warning');return;}
+      if(nw!==cf){showToast('Validation','Passwords do not match.','warning');return;}
+      const btn=document.getElementById('savePwd'); btn.disabled=true; btn.innerHTML='<span class="spinner" style="width:15px;height:15px;border-width:2px;"></span>';
+      try{
+        await reauthenticateWithCredential(auth.currentUser,EmailAuthProvider.credential(email,cur));
+        await updatePassword(auth.currentUser,nw);
+        showToast('Changed','Logging out...','success'); setTimeout(()=>logoutUser(),1500);
+      }catch(e){
+        showToast('Error',(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')?'Current password incorrect.':'Failed.','error');
+      }finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-lock"></i> Change Password';}
+    });
+
+    // Settings
+    document.getElementById('openSettings').addEventListener('click',()=>{ const p=document.getElementById('settingsPanel'); p.style.display=p.style.display==='none'?'block':'none'; });
+    document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsPanel').style.display='none');
+    document.getElementById('saveSettings').addEventListener('click',()=>showToast('Saved','Settings updated.','success'));
+
+    // About
+    document.getElementById('openAbout').addEventListener('click',()=>{ const p=document.getElementById('aboutPanel'); p.style.display=p.style.display==='none'?'block':'none'; });
+    document.getElementById('closeAbout').addEventListener('click',()=>document.getElementById('aboutPanel').style.display='none');
+
+    // Logout
+    document.getElementById('openLogoutConfirm').addEventListener('click',()=>document.getElementById('logoutModal').classList.add('open'));
+    document.getElementById('closeLogoutModal').addEventListener('click',()=>document.getElementById('logoutModal').classList.remove('open'));
+    document.getElementById('cancelLogout').addEventListener('click',()=>document.getElementById('logoutModal').classList.remove('open'));
+    document.getElementById('confirmLogout').addEventListener('click',async()=>await logoutUser());
+  </script>
+</body>
+</html>

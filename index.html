@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="auth-page">
+  <div class="auth-bg"></div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div><span>Loading...</span>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-wrap"><i class="fa-solid fa-motorcycle"></i></div>
+      <h1><span>HONDA</span></h1>
+      <p>Inventory System</p>
+    </div>
+
+    <p class="auth-subtitle">Admin Login</p>
+
+    <div class="alert alert-danger d-none" id="loginAlert">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="loginMsg">Invalid credentials.</span>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label>Username / Email</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-user icon"></i>
+          <input type="email" id="email" placeholder="Enter your email" autocomplete="email" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock icon"></i>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required/>
+          <i class="fa-solid fa-eye toggle" id="togglePwd"></i>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-red btn-block" id="loginBtn" style="margin-top:4px;">
+        <i class="fa-solid fa-right-to-bracket"></i> Login
+      </button>
+    </form>
+
+    <a href="forgot-password.html" class="auth-footer-link" style="margin-top:14px;">
+      <i class="fa-solid fa-key"></i> Forgot Password?
+    </a>
+
+    <div class="auth-footer">
+      <p>Honda Inventory System &copy; 2025</p>
+      <p style="margin-top:3px;font-size:0.7rem;letter-spacing:1px;">THE POWER OF DREAMS</p>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { firebaseConfig } from "./js/firebase-config.js";
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const overlay   = document.getElementById('loadingOverlay');
+    const alert_    = document.getElementById('loginAlert');
+    const alertMsg  = document.getElementById('loginMsg');
+    const loginBtn  = document.getElementById('loginBtn');
+    const pwdInput  = document.getElementById('password');
+    const togglePwd = document.getElementById('togglePwd');
+
+    onAuthStateChanged(auth, user => {
+      if (user) { window.location.href = 'dashboard.html'; }
+      else { overlay.style.display = 'none'; }
+    });
+
+    togglePwd.addEventListener('click', () => {
+      const show = pwdInput.type === 'password';
+      pwdInput.type = show ? 'text' : 'password';
+      togglePwd.className = show ? 'fa-solid fa-eye-slash toggle' : 'fa-solid fa-eye toggle';
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email    = document.getElementById('email').value.trim();
+      const password = pwdInput.value;
+      if (!email || !password) { showAlert('Please fill in all fields.'); return; }
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span class="spinner" style="width:17px;height:17px;border-width:2px;"></span> Logging in...';
+      alert_.classList.add('d-none');
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login';
+        let msg = 'Login failed. Check your credentials.';
+        if (['auth/user-not-found','auth/wrong-password','auth/invalid-credential'].includes(err.code))
+          msg = 'Invalid email or password.';
+        else if (err.code === 'auth/too-many-requests')
+          msg = 'Too many attempts. Try again later.';
+        else if (err.code === 'auth/network-request-failed')
+          msg = 'Network error. Check your connection.';
+        showAlert(msg);
+      }
+    });
+
+    function showAlert(msg) { alertMsg.textContent = msg; alert_.classList.remove('d-none'); }
+  </script>
+</body>
+</html>

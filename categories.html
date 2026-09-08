@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Categories — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item active"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Category Management</h1><p>Organize products — All Products, Vehicles, Parts, Service Items, Others</p></div>
+        <div class="topbar-actions">
+          <button class="btn btn-red btn-sm" id="openAddCat"><i class="fa-solid fa-plus"></i> Add Category</button>
+        </div>
+      </header>
+      <main class="page-content">
+        <div class="alert" style="background:rgba(204,0,0,.06);color:var(--honda-red);border:1px solid rgba(204,0,0,.2);padding:11px 14px;border-radius:var(--radius-sm);display:flex;align-items:center;gap:9px;font-size:.875rem;margin-bottom:18px;">
+          <i class="fa-solid fa-circle-info"></i>
+          Default categories are auto-created on first load: All Products, Vehicles, Parts &amp; Accessories, Service Items, Others.
+        </div>
+
+        <!-- Category Grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;" id="catGrid">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);">
+            <div class="spinner" style="margin:0 auto 10px;"></div>Loading categories...
+          </div>
+        </div>
+
+        <!-- Items in Category -->
+        <div class="card mt-20" id="catItemsCard" style="display:none;">
+          <div class="card-header">
+            <h3 class="card-title" id="catItemsTitle"><i class="fa-solid fa-list-ul"></i> Items in Category</h3>
+            <button class="btn btn-ghost btn-sm" id="closeCatItems"><i class="fa-solid fa-xmark"></i> Close</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Item</th><th>Type</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead>
+              <tbody id="catItemsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" id="catModal">
+    <div class="modal" style="max-width:460px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-tags"></i> <span id="catModalTitle">Add Category</span></h3>
+        <button class="modal-close" id="closeCatModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="catId"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category Name *</label>
+            <div class="input-wrap"><i class="fa-solid fa-tag icon"></i>
+              <input type="text" id="catName" placeholder="e.g. Vehicles"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select id="catType">
+              <option value="other">Other</option>
+              <option value="vehicle">Vehicle</option>
+              <option value="part">Part / Accessory</option>
+              <option value="service">Service Item</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="catDesc" placeholder="Brief description"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelCatModal">Cancel</button>
+        <button class="btn btn-red" id="saveCat"><i class="fa-solid fa-floppy-disk"></i> Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="delCatModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-trash" style="color:var(--danger);"></i> Delete Category</h3>
+        <button class="modal-close" id="closeDelCatModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body"><p>Delete <strong id="delCatName"></strong>? Items in this category will not be deleted.</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelDelCat">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelCat"><i class="fa-solid fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast, formatCurrency, stockBadge } from "./js/auth-guard.js";
+    import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    await requireAuth(); initSidebar();
+    document.getElementById('logoutBtn').addEventListener('click', async e=>{ e.preventDefault(); await logoutUser(); });
+
+    let allCats=[], allV=[], allP=[], delId=null;
+
+    const DEFAULTS=[
+      {name:'All Products',       type:'other',   description:'All inventory items'},
+      {name:'Vehicles',           type:'vehicle', description:'Honda motorcycles and vehicles'},
+      {name:'Parts & Accessories',type:'part',    description:'Genuine Honda parts and accessories'},
+      {name:'Service Items',      type:'service', description:'Service and maintenance items'},
+      {name:'Others',             type:'other',   description:'Other miscellaneous items'},
+    ];
+
+    async function seed(){
+      const snap=await getDocs(collection(db,'categories'));
+      if(snap.empty){ for(const c of DEFAULTS) await addDoc(collection(db,'categories'),{...c,createdAt:serverTimestamp()}); }
+    }
+
+    const typeIcon={vehicle:'fa-motorcycle',part:'fa-gears',service:'fa-screwdriver-wrench',other:'fa-tags'};
+    const typeColor={vehicle:'badge-red',part:'badge-dark',service:'badge-info',other:'badge-dark'};
+
+    async function loadAll(){
+      await seed();
+      const [cs,vs,ps]=await Promise.all([
+        getDocs(query(collection(db,'categories'),orderBy('name'))),
+        getDocs(collection(db,'vehicles')),
+        getDocs(collection(db,'parts'))
+      ]);
+      allCats=cs.docs.map(d=>({id:d.id,...d.data()}));
+      allV=vs.docs.map(d=>({id:d.id,_type:'vehicle',...d.data()}));
+      allP=ps.docs.map(d=>({id:d.id,_type:'part',...d.data()}));
+      renderGrid();
+    }
+
+    function renderGrid(){
+      const grid=document.getElementById('catGrid');
+      if(!allCats.length){grid.innerHTML=`<div style="grid-column:1/-1;"><div class="empty-state"><div class="ei">🏷️</div><h3>No categories yet</h3></div></div>`;return;}
+      grid.innerHTML=allCats.map(cat=>{
+        const vCount=allV.filter(v=>v.category===cat.id).length;
+        const pCount=allP.filter(p=>p.category===cat.id).length;
+        const total=vCount+pCount;
+        const icon=typeIcon[cat.type]||'fa-tags';
+        return`<div style="background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-100);padding:20px 16px;box-shadow:var(--shadow-sm);transition:var(--transition);" onmouseover="this.style.borderColor='var(--honda-red)'" onmouseout="this.style.borderColor='var(--gray-100)'">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+            <div style="width:46px;height:46px;background:var(--honda-red-pale);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid ${icon}" style="font-size:20px;color:var(--honda-red);"></i>
+            </div>
+            <span class="badge ${typeColor[cat.type]||'badge-dark'}" style="font-size:.65rem;">${cat.type||'other'}</span>
+          </div>
+          <div style="font-size:1rem;font-weight:800;color:var(--gray-900);margin-bottom:4px;">${cat.name}</div>
+          <div style="font-size:.775rem;color:var(--gray-400);margin-bottom:12px;">${total} item${total!==1?'s':''}</div>
+          ${cat.description?`<div style="font-size:.75rem;color:var(--gray-400);margin-bottom:12px;">${cat.description}</div>`:''}
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="btn btn-outline btn-sm" style="width:100%;" onclick="viewItems('${cat.id}','${cat.name}')"><i class="fa-solid fa-eye"></i> View Items</button>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="openEditCat('${cat.id}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-danger btn-sm" style="flex:1;" onclick="openDelCat('${cat.id}','${cat.name}')"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    window.viewItems=(catId,catName)=>{
+      const items=[...allV.filter(v=>v.category===catId),...allP.filter(p=>p.category===catId)];
+      document.getElementById('catItemsTitle').innerHTML=`<i class="fa-solid fa-list-ul"></i> ${catName} — ${items.length} Items`;
+      const tb=document.getElementById('catItemsBody');
+      tb.innerHTML=items.length
+        ?items.map(p=>`<tr>
+            <td class="td-name">${p.name}</td>
+            <td><span class="badge ${p._type==='vehicle'?'badge-red':'badge-dark'}">${p._type}</span></td>
+            <td class="fw-700 text-red">${formatCurrency(p.price)}</td>
+            <td class="fw-700">${p.stock??0}</td>
+            <td>${stockBadge(p.stock,p.lowStockThreshold||(p._type==='vehicle'?5:10))}</td>
+          </tr>`).join('')
+        :`<tr><td colspan="5"><div class="empty-state" style="padding:24px;"><div class="ei">📦</div><p>No items in this category.</p></div></td></tr>`;
+      document.getElementById('catItemsCard').style.display='block';
+      document.getElementById('catItemsCard').scrollIntoView({behavior:'smooth'});
+    };
+    document.getElementById('closeCatItems').addEventListener('click',()=>document.getElementById('catItemsCard').style.display='none');
+
+    document.getElementById('openAddCat').addEventListener('click',()=>{
+      document.getElementById('catModalTitle').textContent='Add Category';
+      document.getElementById('catId').value=''; document.getElementById('catName').value='';
+      document.getElementById('catType').value='other'; document.getElementById('catDesc').value='';
+      document.getElementById('catModal').classList.add('open');
+    });
+    document.getElementById('closeCatModal').addEventListener('click',()=>document.getElementById('catModal').classList.remove('open'));
+    document.getElementById('cancelCatModal').addEventListener('click',()=>document.getElementById('catModal').classList.remove('open'));
+
+    window.openEditCat=(id)=>{
+      const c=allCats.find(x=>x.id===id); if(!c) return;
+      document.getElementById('catModalTitle').textContent='Edit Category';
+      document.getElementById('catId').value=c.id; document.getElementById('catName').value=c.name;
+      document.getElementById('catType').value=c.type||'other'; document.getElementById('catDesc').value=c.description||'';
+      document.getElementById('catModal').classList.add('open');
+    };
+    document.getElementById('saveCat').addEventListener('click',async()=>{
+      const id=document.getElementById('catId').value;
+      const name=document.getElementById('catName').value.trim();
+      const type=document.getElementById('catType').value;
+      const desc=document.getElementById('catDesc').value.trim();
+      if(!name){showToast('Validation','Category name required.','warning');return;}
+      const btn=document.getElementById('saveCat');
+      btn.disabled=true; btn.innerHTML='<span class="spinner" style="width:15px;height:15px;border-width:2px;"></span>';
+      try{
+        if(id){await updateDoc(doc(db,'categories',id),{name,type,description:desc,updatedAt:serverTimestamp()});showToast('Updated',`"${name}" updated.`,'success');}
+        else{await addDoc(collection(db,'categories'),{name,type,description:desc,createdAt:serverTimestamp()});showToast('Added',`"${name}" added.`,'success');}
+        document.getElementById('catModal').classList.remove('open'); await loadAll();
+      }catch{showToast('Error','Failed to save.','error');}
+      finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Category';}
+    });
+
+    window.openDelCat=(id,name)=>{delId=id;document.getElementById('delCatName').textContent=`"${name}"`;document.getElementById('delCatModal').classList.add('open');};
+    document.getElementById('closeDelCatModal').addEventListener('click',()=>{document.getElementById('delCatModal').classList.remove('open');delId=null;});
+    document.getElementById('cancelDelCat').addEventListener('click',()=>{document.getElementById('delCatModal').classList.remove('open');delId=null;});
+    document.getElementById('confirmDelCat').addEventListener('click',async()=>{
+      if(!delId) return;
+      try{await deleteDoc(doc(db,'categories',delId));document.getElementById('delCatModal').classList.remove('open');showToast('Deleted','Category removed.','success');await loadAll();}
+      catch{showToast('Error','Failed to delete.','error');} delId=null;
+    });
+
+    await loadAll();
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Activity Logs — Honda Inventory System</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span>Loading...</span></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-bar"><i class="fa-solid fa-motorcycle"></i><div class="brand-name">HONDA<span>Inventory System</span></div></div>
+        <div class="sidebar-tagline">One Heart. Quality Service.</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main Menu</div>
+        <a href="dashboard.html"  class="nav-item"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="vehicles.html"   class="nav-item"><i class="fa-solid fa-motorcycle"></i> Vehicles</a>
+        <a href="parts.html"      class="nav-item"><i class="fa-solid fa-gears"></i> Parts &amp; Accessories</a>
+        <a href="inventory.html"  class="nav-item"><i class="fa-solid fa-warehouse"></i> Inventory</a>
+        <a href="categories.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categories</a>
+        <a href="sales.html"      class="nav-item"><i class="fa-solid fa-cash-register"></i> Sales</a>
+        <a href="logs.html"       class="nav-item active"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+        <div class="nav-label" style="margin-top:10px;">Account</div>
+        <a href="profile.html"    class="nav-item"><i class="fa-solid fa-user-circle"></i> Profile</a>
+        <a href="#" class="nav-item" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="u-avatar"><i class="fa-solid fa-user"></i></div>
+          <div><div class="u-name" id="sidebarUserName">Admin</div><div class="u-role" id="sidebarUserEmail">—</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+      <header class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-left"><h1>Activity Logs</h1><p>Complete audit trail — inventory movements and sales</p></div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" id="exportBtn"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+          <button class="btn btn-outline btn-sm" id="refreshBtn"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+        </div>
+      </header>
+      <main class="page-content">
+        <!-- Summary Chips -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+          <div style="background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;box-shadow:var(--shadow-sm);">
+            <div style="width:36px;height:36px;background:var(--success-light);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--success);"><i class="fa-solid fa-arrow-down"></i></div>
+            <div><div style="font-size:1.2rem;font-weight:900;color:var(--gray-900);" id="chipIn">—</div><div style="font-size:.7rem;color:var(--gray-400);font-weight:600;">Stock-In</div></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;box-shadow:var(--shadow-sm);">
+            <div style="width:36px;height:36px;background:var(--danger-light);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--danger);"><i class="fa-solid fa-arrow-up"></i></div>
+            <div><div style="font-size:1.2rem;font-weight:900;color:var(--gray-900);" id="chipOut">—</div><div style="font-size:.7rem;color:var(--gray-400);font-weight:600;">Stock-Out</div></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;box-shadow:var(--shadow-sm);">
+            <div style="width:36px;height:36px;background:var(--info-light);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--info);"><i class="fa-solid fa-sliders"></i></div>
+            <div><div style="font-size:1.2rem;font-weight:900;color:var(--gray-900);" id="chipAdj">—</div><div style="font-size:.7rem;color:var(--gray-400);font-weight:600;">Adjustments</div></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius-md);padding:12px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:140px;box-shadow:var(--shadow-sm);">
+            <div style="width:36px;height:36px;background:var(--honda-red-pale);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--honda-red);"><i class="fa-solid fa-receipt"></i></div>
+            <div><div style="font-size:1.2rem;font-weight:900;color:var(--gray-900);" id="chipSales">—</div><div style="font-size:.7rem;color:var(--gray-400);font-weight:600;">Sales</div></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="inv"><i class="fa-solid fa-warehouse"></i> Inventory Movements</button>
+          <button class="tab-btn" data-tab="sales"><i class="fa-solid fa-cash-register"></i> Sales Transactions</button>
+          <button class="tab-btn" data-tab="all"><i class="fa-solid fa-list-ul"></i> All Logs</button>
+        </div>
+
+        <!-- Inventory Tab -->
+        <div id="tab-inv">
+          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+            <div class="search-bar" style="flex:1;min-width:170px;"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="invSearch" placeholder="Search item..."/></div>
+            <select id="invTypeF" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;">
+              <option value="">All Types</option><option value="stock_in">Stock In</option><option value="stock_out">Stock Out</option><option value="adjustment">Adjustment</option>
+            </select>
+            <input type="date" id="invDate" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;"/>
+            <button class="btn btn-ghost btn-sm" id="invClear"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Inventory Movement Log</h3>
+              <span class="badge badge-dark" id="invLogCount">0 entries</span>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Type</th><th>Item Name</th><th>Item Type</th><th>Qty</th><th>Before</th><th>After</th><th>Notes</th><th>Date</th></tr></thead>
+                <tbody id="invLogBody"><tr><td colspan="8" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales Tab -->
+        <div id="tab-sales" style="display:none;">
+          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+            <div class="search-bar" style="flex:1;min-width:170px;"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="salesSearch" placeholder="Search order..."/></div>
+            <input type="date" id="salesDate" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;"/>
+            <button class="btn btn-ghost btn-sm" id="salesClear"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Sales Transaction Log</h3>
+              <span class="badge badge-red" id="salesLogCount">0 entries</span>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Qty</th><th>Total</th><th>Date</th><th></th></tr></thead>
+                <tbody id="salesLogBody"><tr><td colspan="7" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Tab -->
+        <div id="tab-all" style="display:none;">
+          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+            <div class="search-bar" style="flex:1;min-width:170px;"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="allSearch" placeholder="Search anything..."/></div>
+            <select id="allTypeF" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;">
+              <option value="">All</option><option value="stock_in">Stock In</option><option value="stock_out">Stock Out</option><option value="adjustment">Adjustment</option><option value="sale">Sale</option>
+            </select>
+            <input type="date" id="allDate" style="padding:7px 10px;border:2px solid var(--gray-200);border-radius:var(--radius-md);font-family:inherit;font-size:.8rem;background:var(--gray-50);outline:none;"/>
+            <button class="btn btn-ghost btn-sm" id="allClear"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-table-list"></i> All Activity Logs</h3>
+              <span class="badge badge-dark" id="allLogCount">0 entries</span>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead><tr><th>Type</th><th>Item / Order</th><th>Qty / Amount</th><th>Before → After</th><th>Notes</th><th>Date</th></tr></thead>
+                <tbody id="allLogBody"><tr><td colspan="6" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Sale Detail Modal -->
+  <div class="modal-overlay" id="saleDetailModal">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-receipt"></i> Transaction Details</h3>
+        <button class="modal-close" id="closeSaleDetail"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="saleDetailBody"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" id="closeSaleDetailBtn">Close</button></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module">
+    import { initFirebase, requireAuth, logoutUser, initSidebar, showToast, formatCurrency, formatDateTime, escapeHtml, debounce } from "./js/auth-guard.js";
+    import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const { db } = initFirebase();
+    await requireAuth(); initSidebar();
+    document.getElementById('logoutBtn').addEventListener('click',async e=>{ e.preventDefault(); await logoutUser(); });
+
+    let invLogs=[], salesLogs=[];
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        ['tab-inv','tab-sales','tab-all'].forEach(id=>document.getElementById(id).style.display='none');
+        btn.classList.add('active');
+        document.getElementById('tab-'+btn.dataset.tab).style.display='block';
+        if(btn.dataset.tab==='all') renderAll();
+      });
+    });
+
+    async function loadInv(){
+      const snap=await getDocs(query(collection(db,'inventory_logs'),orderBy('createdAt','desc'),limit(100)));
+      invLogs=snap.docs.map(d=>({id:d.id,...d.data()}));
+      updateChips(); renderInv(invLogs);
+    }
+    async function loadSales(){
+      const snap=await getDocs(query(collection(db,'sales'),orderBy('createdAt','desc'),limit(100)));
+      salesLogs=snap.docs.map(d=>({id:d.id,...d.data()}));
+      updateChips(); renderSalesLog(salesLogs);
+    }
+    function updateChips(){
+      document.getElementById('chipIn').textContent   =invLogs.filter(l=>l.type==='stock_in').length;
+      document.getElementById('chipOut').textContent  =invLogs.filter(l=>l.type==='stock_out').length;
+      document.getElementById('chipAdj').textContent  =invLogs.filter(l=>l.type==='adjustment').length;
+      document.getElementById('chipSales').textContent=salesLogs.length;
+    }
+
+    function renderInv(logs){
+      document.getElementById('invLogCount').textContent=`${logs.length} entries`;
+      const tb=document.getElementById('invLogBody');
+      if(!logs.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="ei">📋</div><h3>No inventory logs</h3></div></td></tr>`;return;}
+      const tMap={stock_in:{badge:'badge-success',icon:'fa-arrow-down',label:'In'},stock_out:{badge:'badge-danger',icon:'fa-arrow-up',label:'Out'},adjustment:{badge:'badge-info',icon:'fa-sliders',label:'Adj'}};
+      tb.innerHTML=logs.map(l=>{
+        const t=tMap[l.type]||{badge:'badge-dark',icon:'fa-circle',label:l.type};
+        const isIn=l.type==='stock_in';
+        return`<tr>
+          <td><span class="badge ${t.badge}"><i class="fa-solid ${t.icon}"></i> ${t.label}</span></td>
+          <td class="td-name" style="font-size:.875rem;">${escapeHtml(l.itemName)||'—'}</td>
+          <td><span class="badge ${l.itemType==='vehicle'?'badge-red':'badge-dark'}" style="font-size:.65rem;">${l.itemType||'—'}</span></td>
+          <td class="fw-700" style="color:${isIn?'var(--success)':'var(--danger)'};">${isIn?'+':'-'}${l.quantity??0}</td>
+          <td>${l.previousStock??'—'}</td><td>${l.newStock??'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${escapeHtml(l.notes)||'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(l.createdAt)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderSalesLog(sales){
+      document.getElementById('salesLogCount').textContent=`${sales.length} entries`;
+      const tb=document.getElementById('salesLogBody');
+      if(!sales.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="ei">🛒</div><h3>No sales yet</h3></div></td></tr>`;return;}
+      tb.innerHTML=sales.map(s=>`<tr>
+        <td class="td-name" style="font-size:.8rem;">${escapeHtml(s.orderNumber)||s.id.slice(-8).toUpperCase()}</td>
+        <td style="font-size:.8rem;">${escapeHtml(s.customerName)||'—'}</td>
+        <td style="font-size:.78rem;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(s.items||[]).map(i=>`${escapeHtml(i.itemName)} ×${i.quantity}`).join(', ')||'—'}</td>
+        <td class="fw-700">${s.totalQuantity??0}</td>
+        <td class="fw-700 text-red">${formatCurrency(s.totalAmount)}</td>
+        <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(s.createdAt)}</td>
+        <td><button class="btn btn-outline btn-icon" onclick="viewSaleDetail('${s.id}')"><i class="fa-solid fa-eye"></i></button></td>
+      </tr>`).join('');
+    }
+
+    function renderAll(filtered=null){
+      const combined=[...invLogs.map(l=>({...l,_src:'inv'})),...salesLogs.map(l=>({...l,_src:'sale',type:'sale'}))].sort((a,b)=>{
+        const ta=a.createdAt?.toDate?.()||new Date(a.createdAt||0), tb=b.createdAt?.toDate?.()||new Date(b.createdAt||0); return tb-ta;
+      });
+      const data=filtered||combined;
+      document.getElementById('allLogCount').textContent=`${data.length} entries`;
+      const tb=document.getElementById('allLogBody');
+      if(!data.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ei">📄</div><h3>No logs found</h3></div></td></tr>`;return;}
+      tb.innerHTML=data.map(l=>{
+        if(l._src==='sale') return`<tr>
+          <td><span class="badge badge-red"><i class="fa-solid fa-cash-register"></i> Sale</span></td>
+          <td class="td-name" style="font-size:.875rem;">${escapeHtml(l.orderNumber)||l.id.slice(-8).toUpperCase()}</td>
+          <td class="fw-700 text-red">${formatCurrency(l.totalAmount)}</td>
+          <td style="color:var(--gray-400);">qty: ${l.totalQuantity??0}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${escapeHtml(l.notes)||'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(l.createdAt)}</td>
+        </tr>`;
+        const tMap={stock_in:'badge-success',stock_out:'badge-danger',adjustment:'badge-info'};
+        const isIn=l.type==='stock_in'; const sign=isIn?'+':l.type==='stock_out'?'-':'±';
+        const col=isIn?'var(--success)':l.type==='stock_out'?'var(--danger)':'var(--info)';
+        return`<tr>
+          <td><span class="badge ${tMap[l.type]||'badge-dark'}">${l.type.replace('_',' ')}</span></td>
+          <td class="td-name" style="font-size:.875rem;">${escapeHtml(l.itemName)||'—'}</td>
+          <td class="fw-700" style="color:${col};">${sign}${l.quantity??0}</td>
+          <td style="color:var(--gray-400);">${l.previousStock??'—'} → ${l.newStock??'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${escapeHtml(l.notes)||'—'}</td>
+          <td style="font-size:.78rem;color:var(--gray-400);">${formatDateTime(l.createdAt)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.viewSaleDetail=(id)=>{
+      const s=salesLogs.find(x=>x.id===id); if(!s) return;
+      document.getElementById('saleDetailBody').innerHTML=`
+        <div style="margin-bottom:13px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Order #</span><span class="fw-800">${escapeHtml(s.orderNumber)||s.id.slice(-8).toUpperCase()}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Customer</span><span class="fw-700">${escapeHtml(s.customerName)||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:var(--gray-400);font-size:.875rem;">Date</span><span>${formatDateTime(s.createdAt)}</span></div>
+          ${s.notes?`<div style="display:flex;justify-content:space-between;"><span style="color:var(--gray-400);font-size:.875rem;">Notes</span><span>${escapeHtml(s.notes)}</span></div>`:''}
+        </div>
+        <div class="divider"></div>
+        <table style="width:100%;margin-bottom:13px;">
+          <thead><tr>
+            <th style="padding:7px;text-align:left;font-size:.7rem;color:var(--gray-400);">Item</th>
+            <th style="padding:7px;text-align:center;font-size:.7rem;color:var(--gray-400);">Qty</th>
+            <th style="padding:7px;text-align:right;font-size:.7rem;color:var(--gray-400);">Subtotal</th>
+          </tr></thead>
+          <tbody>${(s.items||[]).map(i=>`<tr>
+            <td style="padding:7px;font-size:.875rem;">${escapeHtml(i.itemName)}</td>
+            <td style="padding:7px;text-align:center;">${i.quantity}</td>
+            <td style="padding:7px;text-align:right;font-weight:700;">${formatCurrency(i.subtotal)}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;">
+          <span class="fw-800">TOTAL</span>
+          <span style="font-size:1.25rem;font-weight:900;color:var(--honda-red);">${formatCurrency(s.totalAmount)}</span>
+        </div>`;
+      document.getElementById('saleDetailModal').classList.add('open');
+    };
+    document.getElementById('closeSaleDetail').addEventListener('click',()=>document.getElementById('saleDetailModal').classList.remove('open'));
+    document.getElementById('closeSaleDetailBtn').addEventListener('click',()=>document.getElementById('saleDetailModal').classList.remove('open'));
+
+    // Filters
+    const filterInv=debounce(()=>{
+      const s=document.getElementById('invSearch').value.toLowerCase();
+      const t=document.getElementById('invTypeF').value;
+      const d=document.getElementById('invDate').value;
+      renderInv(invLogs.filter(l=>{
+        const mS=!s||(l.itemName||'').toLowerCase().includes(s)||(l.notes||'').toLowerCase().includes(s);
+        const mT=!t||l.type===t;
+        const mD=!d||(()=>{const dt=l.createdAt?.toDate?.()||new Date(l.createdAt||0);return dt.toISOString().slice(0,10)===d;})();
+        return mS&&mT&&mD;
+      }));
+    },200);
+    document.getElementById('invSearch').addEventListener('input',filterInv);
+    document.getElementById('invTypeF').addEventListener('change',filterInv);
+    document.getElementById('invDate').addEventListener('change',filterInv);
+    document.getElementById('invClear').addEventListener('click',()=>{ document.getElementById('invSearch').value=''; document.getElementById('invTypeF').value=''; document.getElementById('invDate').value=''; renderInv(invLogs); });
+
+    const filterSales=debounce(()=>{
+      const s=document.getElementById('salesSearch').value.toLowerCase();
+      const d=document.getElementById('salesDate').value;
+      renderSalesLog(salesLogs.filter(l=>{
+        const mS=!s||(l.orderNumber||'').toLowerCase().includes(s)||(l.customerName||'').toLowerCase().includes(s)||(l.items||[]).some(i=>(i.itemName||'').toLowerCase().includes(s));
+        const mD=!d||(()=>{const dt=l.createdAt?.toDate?.()||new Date(l.createdAt||0);return dt.toISOString().slice(0,10)===d;})();
+        return mS&&mD;
+      }));
+    },200);
+    document.getElementById('salesSearch').addEventListener('input',filterSales);
+    document.getElementById('salesDate').addEventListener('change',filterSales);
+    document.getElementById('salesClear').addEventListener('click',()=>{ document.getElementById('salesSearch').value=''; document.getElementById('salesDate').value=''; renderSalesLog(salesLogs); });
+
+    const filterAll=debounce(()=>{
+      const combined=[...invLogs.map(l=>({...l,_src:'inv'})),...salesLogs.map(l=>({...l,_src:'sale',type:'sale'}))].sort((a,b)=>{const ta=a.createdAt?.toDate?.()||new Date(a.createdAt||0),tb=b.createdAt?.toDate?.()||new Date(b.createdAt||0);return tb-ta;});
+      const s=document.getElementById('allSearch').value.toLowerCase();
+      const t=document.getElementById('allTypeF').value;
+      const d=document.getElementById('allDate').value;
+      renderAll(combined.filter(l=>{
+        const text=[(l.itemName||''),(l.orderNumber||''),(l.customerName||''),(l.notes||''),...(l.items||[]).map(i=>i.itemName||'')].join(' ').toLowerCase();
+        const mS=!s||text.includes(s); const mT=!t||l.type===t;
+        const mD=!d||(()=>{const dt=l.createdAt?.toDate?.()||new Date(l.createdAt||0);return dt.toISOString().slice(0,10)===d;})();
+        return mS&&mT&&mD;
+      }));
+    },200);
+    document.getElementById('allSearch').addEventListener('input',filterAll);
+    document.getElementById('allTypeF').addEventListener('change',filterAll);
+    document.getElementById('allDate').addEventListener('change',filterAll);
+    document.getElementById('allClear').addEventListener('click',()=>{ document.getElementById('allSearch').value=''; document.getElementById('allTypeF').value=''; document.getElementById('allDate').value=''; renderAll(); });
+
+    // Refresh
+    document.getElementById('refreshBtn').addEventListener('click',async()=>{
+      invLogs=[]; salesLogs=[]; await Promise.all([loadInv(),loadSales()]); showToast('Refreshed','Logs reloaded.','info');
+    });
+
+    // Export CSV
+    document.getElementById('exportBtn').addEventListener('click',()=>{
+      const rows=[['Type','Item / Order','Qty / Amount','Before','After','Notes','Date']];
+      invLogs.forEach(l=>rows.push([l.type,l.itemName||'',l.quantity||'',l.previousStock??'',l.newStock??'',l.notes||'',formatDateTime(l.createdAt)]));
+      salesLogs.forEach(s=>rows.push(['sale',s.orderNumber||s.id,formatCurrency(s.totalAmount),'','',s.notes||'',formatDateTime(s.createdAt)]));
+      const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob=new Blob([csv],{type:'text/csv'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=`honda-logs-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+      showToast('Exported','CSV downloaded.','success');
+    });
+
+    await Promise.all([loadInv(),loadSales()]);
+  </script>
+</body>
+</html>
